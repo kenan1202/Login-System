@@ -1,0 +1,74 @@
+<%- include('partials/header'); -%>
+
+
+
+<div class = "form">
+    <form id = "loginForm" action="/login">
+        <h1>Login</h1>
+        <input type = "text" placeholder = "Email" class = "email">
+        <p class = "errorEmail"></p>
+        <input type = "password" placeholder = "Password" class = "password">
+        <p class = "errorPassword"></p>
+        <button>Login</button>
+    </form>
+</div>
+</body>
+</html>
+
+<script>
+
+    const form = document.querySelector('#loginForm');
+    const emailForm = document.querySelector('.email');
+    const passwordForm = document.querySelector('.password');
+    const errorEmail = document.querySelector('.errorEmail');
+    const errorPassword = document.querySelector('.errorPassword');
+
+
+    errorEmail.innerHTML = '';
+    errorPassword.innerHTML = '';
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        errorEmail.innerHTML = '';
+        errorPassword.innerHTML = '';
+
+        const email = emailForm.value;
+        const password = passwordForm.value;
+
+        const result = await fetch('/login', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				email,
+				password
+			})
+		}).then((res) => res.json());
+
+        if(result.user) {
+            location.assign('/');
+        }
+
+
+
+        if(result.status == 'errorEmail') {
+            errorEmail.innerHTML = result.error;
+        }
+
+        if(result.status == 'errorPassword') {
+            errorPassword.innerHTML = result.error;
+        }
+        
+        if(result.status == 'errorBoth') {
+            errorEmail.innerHTML = 'Please enter an email';
+            errorPassword.innerHTML = 'Please enter an password';
+        }
+
+        if(result.error == 'Invalid username or password') {
+            errorEmail.innerHTML = 'Invalid username or password';
+        }
+
+    });
+</script>
